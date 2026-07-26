@@ -6,6 +6,9 @@ on:
     branches:
       - "claude/**"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,3 +34,14 @@ jobs:
         with:
           name: tessy-creations-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
+      # Also publish as a direct-download Release asset (a plain .apk file,
+      # not a zip) so it can be downloaded and installed straight from a
+      # phone browser without needing a computer to unzip anything.
+      - name: Publish APK to "latest-apk" release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-apk
+          name: Latest APK build
+          body: Automatically built from commit ${{ github.sha }} on branch ${{ github.ref_name }}.
+          files: build/app/outputs/flutter-apk/app-release.apk
