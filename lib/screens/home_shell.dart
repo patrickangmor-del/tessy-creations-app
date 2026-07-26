@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'calendar/calendar_screen.dart';
 import 'customers/customers_list_screen.dart';
 import 'orders/orders_list_screen.dart';
 
@@ -27,7 +28,7 @@ class _HomeShellState extends State<HomeShell> {
   static final _bodies = [
     const CustomersListScreen(),
     const OrdersListScreen(),
-    const _ComingSoon(title: 'Calendar'),
+    const CalendarScreen(),
     const _ComingSoon(title: 'Finances'),
   ];
 

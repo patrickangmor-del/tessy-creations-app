@@ -88,10 +88,59 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    expect(find.text('Calendar module coming up next'), findsNothing);
+    expect(find.text('Finances module coming up next'), findsNothing);
+    await tester.tap(find.text('Finances'));
+    await tester.pumpAndSettle();
+    expect(find.text('Finances module coming up next'), findsOneWidget);
+  });
+
+  testWidgets('Calendar tab shows upcoming pickups for an order with a due date', (tester) async {
+    final customers = _fakeCustomersController();
+    await customers.load();
+    await customers.add(
+      Customer(
+        id: 'c1',
+        name: 'Amara Obi',
+        phone: '',
+        notes: '',
+        photoPath: null,
+        bust: null,
+        waist: null,
+        hip: null,
+        shoulder: null,
+        sleeveLength: null,
+        fullLength: null,
+        createdAt: DateTime.now(),
+      ),
+    );
+    final orders = _fakeOrdersController();
+    await orders.load();
+    final dueDate = DateTime.now().add(const Duration(days: 5));
+    final dueIso =
+        '${dueDate.year.toString().padLeft(4, '0')}-${dueDate.month.toString().padLeft(2, '0')}-${dueDate.day.toString().padLeft(2, '0')}';
+    await orders.add(
+      Order(
+        id: 'o1',
+        customerId: 'c1',
+        dressType: 'Gown',
+        fabricDescription: '',
+        fabricPhotoPath: null,
+        price: 500,
+        dueDate: dueIso,
+        status: orderStatuses.first,
+        createdAt: DateTime.now(),
+        payments: const [],
+      ),
+    );
+
+    await tester.pumpWidget(_app(customers: customers, orders: orders));
+    await tester.pumpAndSettle();
+
     await tester.tap(find.text('Calendar'));
     await tester.pumpAndSettle();
-    expect(find.text('Calendar module coming up next'), findsOneWidget);
+
+    expect(find.text('UPCOMING PICKUPS'), findsOneWidget);
+    expect(find.text('Amara Obi'), findsOneWidget);
   });
 
   testWidgets('Empty state shows on Customers tab with no customers', (tester) async {
