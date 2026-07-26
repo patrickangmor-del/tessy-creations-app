@@ -158,10 +158,7 @@ class _MonthGrid extends StatelessWidget {
         ),
         if (selectedDate != null && dueMap[selectedDate] != null) ...[
           const SizedBox(height: 16),
-          Text(
-            'DUE ${formatDate(selectedDate).toUpperCase()}',
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
-          ),
+          Text('DUE ${formatDate(selectedDate).toUpperCase()}', style: sectionLabelStyle),
           const SizedBox(height: 8),
           for (final order in dueMap[selectedDate]!) _SelectedDayOrder(order: order),
         ],
@@ -265,10 +262,7 @@ class _UpcomingList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'UPCOMING PICKUPS',
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
-        ),
+        const Text('UPCOMING PICKUPS', style: sectionLabelStyle),
         const SizedBox(height: 8),
         if (orders.isEmpty)
           const Text('Nothing scheduled.', style: TextStyle(color: AppColors.inkSoft))

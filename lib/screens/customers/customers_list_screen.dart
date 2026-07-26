@@ -7,6 +7,7 @@ import '../../data/models/customer.dart';
 import '../../state/customers_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/cut_card.dart';
+import '../../widgets/empty_state.dart';
 import 'customer_detail_screen.dart';
 import 'customer_form_screen.dart';
 
@@ -25,15 +26,9 @@ class CustomersListScreen extends StatelessWidget {
 
     return Scaffold(
       body: customers.isEmpty
-          ? const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'No customers yet. Tap the + button to add your first one.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppColors.inkSoft),
-                ),
-              ),
+          ? const EmptyState(
+              icon: Icons.people_outline,
+              message: 'No customers yet. Tap the + button to add your first one.',
             )
           : ListView.separated(
               padding: const EdgeInsets.all(16),

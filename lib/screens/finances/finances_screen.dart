@@ -107,10 +107,7 @@ class FinancesScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const Text(
-          'PAYMENTS COLLECTED BY MONTH',
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
-        ),
+        const Text('PAYMENTS COLLECTED BY MONTH', style: sectionLabelStyle),
         const SizedBox(height: 12),
         SizedBox(
           height: 200,
@@ -121,10 +118,7 @@ class FinancesScreen extends StatelessWidget {
               : _RevenueChart(data: monthly),
         ),
         const SizedBox(height: 24),
-        const Text(
-          'RECENT TRANSACTIONS',
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
-        ),
+        const Text('RECENT TRANSACTIONS', style: sectionLabelStyle),
         const SizedBox(height: 8),
         if (recentTransactions.isEmpty)
           const Padding(
@@ -156,6 +150,9 @@ class _SummaryCard extends StatelessWidget {
     return CutCard(
       accent: accent,
       padding: const EdgeInsets.all(10),
+      // These three sit close together in a row; the corner icon would
+      // overlap into the next card at this width, so it's turned off here.
+      showIcon: false,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -9,6 +9,7 @@ import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/cut_card.dart';
+import '../../widgets/empty_state.dart';
 import '../../widgets/status_stepper.dart';
 import 'order_form_screen.dart';
 
@@ -36,50 +37,54 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
         : ordersController.orders.where((o) => o.status == _filter).toList();
 
     return Scaffold(
-      body: Column(
-        children: [
-          if (customers.isEmpty)
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Text(
-                'Add a customer first before creating an order.',
-                style: TextStyle(color: AppColors.inkSoft),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: SizedBox(
-              height: 34,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  for (final s in ['All', ...orderStatuses]) _FilterChip(
-                    label: s,
-                    selected: _filter == s,
-                    onTap: () => setState(() => _filter = s),
+      // With no customers there can be no orders yet either (deleting a
+      // customer cascades to their orders), so show a single explanation
+      // instead of stacking it on top of a separate "no orders" state.
+      body: customers.isEmpty
+          ? const EmptyState(
+              icon: Icons.checkroom_outlined,
+              message: 'Add a customer first before creating an order.',
+            )
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: SizedBox(
+                    height: 34,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        for (final s in ['All', ...orderStatuses]) _FilterChip(
+                          label: s,
+                          selected: _filter == s,
+                          onTap: () => setState(() => _filter = s),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+                Expanded(
+                  child: orders.isEmpty
+                      ? const EmptyState(
+                          icon: Icons.checkroom_outlined,
+                          message: 'No orders in this view.',
+                        )
+                      : ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          itemCount: orders.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 12),
+                          itemBuilder: (context, i) => _OrderCard(order: orders[i]),
+                        ),
+                ),
+              ],
             ),
-          ),
-          Expanded(
-            child: orders.isEmpty
-                ? const Center(
-                    child: Text('No orders in this view.', style: TextStyle(color: AppColors.inkSoft)),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                    itemCount: orders.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, i) => _OrderCard(order: orders[i]),
-                  ),
-          ),
-        ],
-      ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'orders-fab',
-        backgroundColor: AppColors.thread,
-        foregroundColor: Colors.white,
+        // FloatingActionButton doesn't dim itself for a null onPressed like
+        // other Material buttons do, so without this it would look tappable
+        // even while disabled.
+        backgroundColor: customers.isEmpty ? AppColors.paperDark : AppColors.thread,
+        foregroundColor: customers.isEmpty ? AppColors.inkSoft : Colors.white,
         onPressed: customers.isEmpty
             ? null
             : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderFormScreen())),
@@ -153,7 +158,7 @@ class _OrderCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(order.dressType, style: const TextStyle(fontWeight: FontWeight.w700)),
+                    Text(order.dressType, style: const TextStyle(fontWeight: FontWeight.w600)),
                     Text(customerName, style: const TextStyle(fontSize: 12, color: AppColors.inkSoft)),
                   ],
                 ),

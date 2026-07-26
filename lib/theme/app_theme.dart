@@ -18,6 +18,16 @@ class AppColors {
   static const inputBorder = Color(0xFFD8CBA8);
 }
 
+/// The small uppercase heading used above a section of content (e.g.
+/// "MEASUREMENTS", "UPCOMING PICKUPS") — kept in one place so every screen
+/// uses the exact same size, weight, and letter spacing.
+const sectionLabelStyle = TextStyle(
+  fontSize: 11,
+  fontWeight: FontWeight.w600,
+  color: AppColors.inkSoft,
+  letterSpacing: 0.5,
+);
+
 ThemeData buildAppTheme() {
   final base = ThemeData(
     useMaterial3: true,

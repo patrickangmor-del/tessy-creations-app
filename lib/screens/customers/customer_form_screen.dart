@@ -141,15 +141,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
               maxLines: 4,
             ),
             const SizedBox(height: 20),
-            const Text(
-              'MEASUREMENTS (INCHES)',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.inkSoft,
-                letterSpacing: 0.5,
-              ),
-            ),
+            const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
             const SizedBox(height: 8),
             GridView.count(
               crossAxisCount: 3,
