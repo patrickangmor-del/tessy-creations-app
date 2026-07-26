@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// Color palette carried over from the original prototype design
-/// (warm paper / thread-green tailoring theme).
+/// (warm paper / craft tailoring theme), with the primary "thread" accent
+/// in plum/purple.
 class AppColors {
   AppColors._();
 
@@ -10,8 +11,8 @@ class AppColors {
   static const cream = Color(0xFFFAF6EC);
   static const ink = Color(0xFF2B2A28);
   static const inkSoft = Color(0xFF6B6558);
-  static const thread = Color(0xFF3F6E64);
-  static const threadDark = Color(0xFF2A4C44);
+  static const thread = Color(0xFF6C4A80);
+  static const threadDark = Color(0xFF4A3159);
   static const pin = Color(0xFFB3402F);
   static const gold = Color(0xFFC08F1E);
   static const dashedBorder = Color(0xFFB8AD8F);
