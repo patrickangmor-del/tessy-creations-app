@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'screens/home_shell.dart';
 import 'state/customers_controller.dart';
+import 'state/orders_controller.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -10,11 +11,12 @@ void main() {
 }
 
 class TessyApp extends StatelessWidget {
-  /// [customersController] lets tests inject a controller backed by a fake
-  /// repository instead of the real on-device database.
-  const TessyApp({super.key, this.customersController});
+  /// [customersController] / [ordersController] let tests inject controllers
+  /// backed by fake repositories instead of the real on-device database.
+  const TessyApp({super.key, this.customersController, this.ordersController});
 
   final CustomersController? customersController;
+  final OrdersController? ordersController;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,9 @@ class TessyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => customersController ?? (CustomersController()..load()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ordersController ?? (OrdersController()..load()),
         ),
       ],
       child: MaterialApp(

@@ -42,6 +42,7 @@ class CustomersListScreen extends StatelessWidget {
               itemBuilder: (context, i) => _CustomerTile(customer: customers[i]),
             ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'customers-fab',
         backgroundColor: AppColors.thread,
         foregroundColor: Colors.white,
         onPressed: () => Navigator.push(

@@ -11,7 +11,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const _dbName = 'tessy_creations.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   Database? _db;
 
@@ -26,6 +26,7 @@ class AppDatabase {
     return openDatabase(
       path,
       version: _dbVersion,
+      onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -48,9 +49,38 @@ class AppDatabase {
         createdAt TEXT NOT NULL
       )
     ''');
+    await _createOrdersAndPayments(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // No migrations yet — this is version 1.
+    if (oldVersion < 2) {
+      await _createOrdersAndPayments(db);
+    }
+  }
+
+  Future<void> _createOrdersAndPayments(Database db) async {
+    await db.execute('''
+      CREATE TABLE orders (
+        id TEXT PRIMARY KEY,
+        customerId TEXT NOT NULL,
+        dressType TEXT NOT NULL,
+        fabricDescription TEXT NOT NULL DEFAULT '',
+        fabricPhotoPath TEXT,
+        price REAL NOT NULL,
+        dueDate TEXT,
+        status TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        FOREIGN KEY (customerId) REFERENCES customers (id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE payments (
+        id TEXT PRIMARY KEY,
+        orderId TEXT NOT NULL,
+        amount REAL NOT NULL,
+        date TEXT NOT NULL,
+        FOREIGN KEY (orderId) REFERENCES orders (id) ON DELETE CASCADE
+      )
+    ''');
   }
 }

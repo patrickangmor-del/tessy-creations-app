@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'customers/customers_list_screen.dart';
+import 'orders/orders_list_screen.dart';
 
 /// Bottom-navigation shell for the four Phase 1 modules.
 ///
@@ -25,7 +26,7 @@ class _HomeShellState extends State<HomeShell> {
 
   static final _bodies = [
     const CustomersListScreen(),
-    const _ComingSoon(title: 'Orders'),
+    const OrdersListScreen(),
     const _ComingSoon(title: 'Calendar'),
     const _ComingSoon(title: 'Finances'),
   ];

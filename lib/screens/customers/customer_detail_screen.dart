@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/models/customer.dart';
 import '../../state/customers_controller.dart';
+import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../utils/photo_storage.dart';
@@ -35,8 +36,17 @@ class CustomerDetailScreen extends StatelessWidget {
     if (confirmed != true || !context.mounted) return;
 
     final controller = context.read<CustomersController>();
+    final ordersController = context.read<OrdersController>();
+
+    // The DB cascades order (and payment) deletion for this customer, but
+    // their fabric photo files live on disk and need cleaning up here.
+    final theirOrders = ordersController.forCustomer(customer.id);
+    for (final order in theirOrders) {
+      await deleteSavedPhoto(order.fabricPhotoPath);
+    }
     await deleteSavedPhoto(customer.photoPath);
     await controller.remove(customer.id);
+    await ordersController.load();
     if (context.mounted) Navigator.pop(context);
   }
 
