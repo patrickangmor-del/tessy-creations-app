@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'calendar/calendar_screen.dart';
 import 'customers/customers_list_screen.dart';
+import 'finances/finances_screen.dart';
 import 'orders/orders_list_screen.dart';
 
 /// Bottom-navigation shell for the four Phase 1 modules.
-///
-/// Each tab body is swapped in below once its module is built; until then
-/// [_ComingSoon] is shown as a placeholder so the app still runs end to end.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -29,7 +27,7 @@ class _HomeShellState extends State<HomeShell> {
     const CustomersListScreen(),
     const OrdersListScreen(),
     const CalendarScreen(),
-    const _ComingSoon(title: 'Finances'),
+    const FinancesScreen(),
   ];
 
   @override
@@ -64,19 +62,4 @@ class _TabSpec {
   const _TabSpec(this.label, this.icon);
   final String label;
   final IconData icon;
-}
-
-class _ComingSoon extends StatelessWidget {
-  const _ComingSoon({required this.title});
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        '$title module coming up next',
-        style: const TextStyle(color: AppColors.inkSoft),
-      ),
-    );
-  }
 }

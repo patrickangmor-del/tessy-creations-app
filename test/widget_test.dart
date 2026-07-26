@@ -88,10 +88,10 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    expect(find.text('Finances module coming up next'), findsNothing);
+    expect(find.text('PAYMENTS COLLECTED BY MONTH'), findsNothing);
     await tester.tap(find.text('Finances'));
     await tester.pumpAndSettle();
-    expect(find.text('Finances module coming up next'), findsOneWidget);
+    expect(find.text('PAYMENTS COLLECTED BY MONTH'), findsOneWidget);
   });
 
   testWidgets('Calendar tab shows upcoming pickups for an order with a due date', (tester) async {
@@ -222,5 +222,54 @@ void main() {
     expect(find.text('₵500'), findsOneWidget);
     expect(find.text('₵200'), findsOneWidget);
     expect(find.text('₵300'), findsOneWidget); // balance
+  });
+
+  testWidgets('Finances tab totals revenue, collected and outstanding', (tester) async {
+    final customers = _fakeCustomersController();
+    await customers.load();
+    await customers.add(
+      Customer(
+        id: 'c1',
+        name: 'Amara Obi',
+        phone: '',
+        notes: '',
+        photoPath: null,
+        bust: null,
+        waist: null,
+        hip: null,
+        shoulder: null,
+        sleeveLength: null,
+        fullLength: null,
+        createdAt: DateTime.now(),
+      ),
+    );
+    final orders = _fakeOrdersController();
+    await orders.load();
+    await orders.add(
+      Order(
+        id: 'o1',
+        customerId: 'c1',
+        dressType: 'Gown',
+        fabricDescription: '',
+        fabricPhotoPath: null,
+        price: 500,
+        dueDate: null,
+        status: orderStatuses.first,
+        createdAt: DateTime.now(),
+        payments: const [],
+      ),
+      initialDeposit: 200,
+    );
+
+    await tester.pumpWidget(_app(customers: customers, orders: orders));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Finances'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('₵500'), findsOneWidget); // revenue
+    expect(find.text('₵200'), findsOneWidget); // collected
+    expect(find.text('₵300'), findsOneWidget); // outstanding
+    expect(find.textContaining('Amara Obi'), findsOneWidget); // recent transaction
   });
 }
