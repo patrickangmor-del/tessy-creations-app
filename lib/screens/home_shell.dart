@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'customers/customers_list_screen.dart';
 
 /// Bottom-navigation shell for the four Phase 1 modules.
 ///
@@ -22,6 +23,13 @@ class _HomeShellState extends State<HomeShell> {
     _TabSpec('Finances', Icons.payments_outlined),
   ];
 
+  static final _bodies = [
+    const CustomersListScreen(),
+    const _ComingSoon(title: 'Orders'),
+    const _ComingSoon(title: 'Calendar'),
+    const _ComingSoon(title: 'Finances'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +44,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
       ),
       body: SafeArea(
-        child: _ComingSoon(title: _tabs[_index].label),
+        child: IndexedStack(index: _index, children: _bodies),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
