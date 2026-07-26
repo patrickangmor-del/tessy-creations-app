@@ -2,8 +2,8 @@ import 'package:intl/intl.dart';
 
 final _moneyFormat = NumberFormat.decimalPattern();
 
-/// Formats a number as Naira, e.g. 15000 -> "₦15,000".
-String formatMoney(num? amount) => '₦${_moneyFormat.format(amount ?? 0)}';
+/// Formats a number as Ghana cedis, e.g. 15000 -> "₵15,000".
+String formatMoney(num? amount) => '₵${_moneyFormat.format(amount ?? 0)}';
 
 /// Formats a stored ISO date string (yyyy-MM-dd) as "Jan 5, 2026".
 String formatDate(String? isoDate) {
