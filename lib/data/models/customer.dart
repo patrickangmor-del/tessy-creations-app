@@ -5,13 +5,50 @@ class MeasurementField {
   final String label;
 }
 
-const measurementFields = [
-  MeasurementField('bust', 'Bust'),
-  MeasurementField('waist', 'Waist'),
-  MeasurementField('hip', 'Hip'),
-  MeasurementField('shoulder', 'Shoulder'),
-  MeasurementField('sleeveLength', 'Sleeve Length'),
-  MeasurementField('fullLength', 'Full Length'),
+/// A group of related measurement fields, shown under a shared heading
+/// (e.g. the three skirt-length variants). [title] is null for the leading
+/// group of general fields, which sits directly under the screen's own
+/// "Measurements" heading with no sub-heading of its own.
+class MeasurementSection {
+  const MeasurementSection(this.title, this.fields);
+  final String? title;
+  final List<MeasurementField> fields;
+}
+
+const measurementSections = [
+  MeasurementSection(null, [
+    MeasurementField('bust', 'Bust'),
+    MeasurementField('waist', 'Waist'),
+    MeasurementField('hips', 'Hips'),
+    MeasurementField('shoulderToNipple', 'Shoulder to Nipple'),
+    MeasurementField('shoulderToUnderBust', 'Shoulder to Under Bust'),
+    MeasurementField('shoulderToWaist', 'Shoulder to Waist'),
+    MeasurementField('acrossBack', 'Across Back'),
+    MeasurementField('backWaistLength', 'Back Waist Length'),
+    MeasurementField('aroundShoulder', 'Around Shoulder'),
+  ]),
+  MeasurementSection('Skirt / Slit Length', [
+    MeasurementField('skirtLengthKnee', 'Knee Length'),
+    MeasurementField('skirtLengthThreeQuarter', '3/4 Length'),
+    MeasurementField('skirtLengthAnkle', 'Ankle Length'),
+    MeasurementField('slitLength', 'Slit Length'),
+  ]),
+  MeasurementSection('Sleeve Length', [
+    MeasurementField('sleeveLengthShort', 'Short'),
+    MeasurementField('sleeveLengthElbow', 'Elbow'),
+    MeasurementField('sleeveLengthLong', 'Long'),
+  ]),
+  MeasurementSection('Around Arm', [
+    MeasurementField('aroundArmShort', 'Short'),
+    MeasurementField('aroundArmElbow', 'Elbow'),
+    MeasurementField('aroundArmWrist', 'Wrist'),
+  ]),
+];
+
+/// Flat view of every field across all sections, in order — used wherever
+/// the grouping doesn't matter (database columns, building a blank map).
+final measurementFields = [
+  for (final section in measurementSections) ...section.fields,
 ];
 
 class Customer {
@@ -21,12 +58,7 @@ class Customer {
     required this.phone,
     required this.notes,
     required this.photoPath,
-    required this.bust,
-    required this.waist,
-    required this.hip,
-    required this.shoulder,
-    required this.sleeveLength,
-    required this.fullLength,
+    required this.measurements,
     required this.createdAt,
   });
 
@@ -35,34 +67,12 @@ class Customer {
   final String phone;
   final String notes;
   final String? photoPath;
-  final double? bust;
-  final double? waist;
-  final double? hip;
-  final double? shoulder;
-  final double? sleeveLength;
-  final double? fullLength;
+
+  /// Keyed by [MeasurementField.key]. Missing or null means not recorded.
+  final Map<String, double?> measurements;
   final DateTime createdAt;
 
-  /// Reads a measurement by [MeasurementField.key], for building the
-  /// measurement grid without repeating a field-by-field switch everywhere.
-  double? measurement(String key) {
-    switch (key) {
-      case 'bust':
-        return bust;
-      case 'waist':
-        return waist;
-      case 'hip':
-        return hip;
-      case 'shoulder':
-        return shoulder;
-      case 'sleeveLength':
-        return sleeveLength;
-      case 'fullLength':
-        return fullLength;
-      default:
-        return null;
-    }
-  }
+  double? measurement(String key) => measurements[key];
 
   Customer copyWith({
     String? name,
@@ -70,12 +80,7 @@ class Customer {
     String? notes,
     String? photoPath,
     bool clearPhoto = false,
-    double? bust,
-    double? waist,
-    double? hip,
-    double? shoulder,
-    double? sleeveLength,
-    double? fullLength,
+    Map<String, double?>? measurements,
   }) {
     return Customer(
       id: id,
@@ -83,31 +88,26 @@ class Customer {
       phone: phone ?? this.phone,
       notes: notes ?? this.notes,
       photoPath: clearPhoto ? null : (photoPath ?? this.photoPath),
-      bust: bust ?? this.bust,
-      waist: waist ?? this.waist,
-      hip: hip ?? this.hip,
-      shoulder: shoulder ?? this.shoulder,
-      sleeveLength: sleeveLength ?? this.sleeveLength,
-      fullLength: fullLength ?? this.fullLength,
+      measurements: measurements ?? this.measurements,
       createdAt: createdAt,
     );
   }
 
+  /// Each measurement is its own database column, so it's expanded out here
+  /// rather than stored as the map itself.
   Map<String, Object?> toMap() {
-    return {
+    final map = <String, Object?>{
       'id': id,
       'name': name,
       'phone': phone,
       'notes': notes,
       'photoPath': photoPath,
-      'bust': bust,
-      'waist': waist,
-      'hip': hip,
-      'shoulder': shoulder,
-      'sleeveLength': sleeveLength,
-      'fullLength': fullLength,
       'createdAt': createdAt.toIso8601String(),
     };
+    for (final field in measurementFields) {
+      map[field.key] = measurements[field.key];
+    }
+    return map;
   }
 
   factory Customer.fromMap(Map<String, Object?> map) {
@@ -117,12 +117,9 @@ class Customer {
       phone: map['phone'] as String? ?? '',
       notes: map['notes'] as String? ?? '',
       photoPath: map['photoPath'] as String?,
-      bust: (map['bust'] as num?)?.toDouble(),
-      waist: (map['waist'] as num?)?.toDouble(),
-      hip: (map['hip'] as num?)?.toDouble(),
-      shoulder: (map['shoulder'] as num?)?.toDouble(),
-      sleeveLength: (map['sleeveLength'] as num?)?.toDouble(),
-      fullLength: (map['fullLength'] as num?)?.toDouble(),
+      measurements: {
+        for (final field in measurementFields) field.key: (map[field.key] as num?)?.toDouble(),
+      },
       createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }

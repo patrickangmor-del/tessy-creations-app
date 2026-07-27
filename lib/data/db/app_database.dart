@@ -1,6 +1,8 @@
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import '../models/customer.dart';
+
 /// Single shared SQLite database for the whole app.
 ///
 /// Everything lives on-device — there is no server and no sync. Tables are
@@ -11,7 +13,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const _dbName = 'tessy_creations.db';
-  static const _dbVersion = 2;
+  static const _dbVersion = 3;
 
   Database? _db;
 
@@ -33,6 +35,7 @@ class AppDatabase {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    final measurementColumns = measurementFields.map((f) => '${f.key} REAL').join(',\n        ');
     await db.execute('''
       CREATE TABLE customers (
         id TEXT PRIMARY KEY,
@@ -40,12 +43,7 @@ class AppDatabase {
         phone TEXT NOT NULL DEFAULT '',
         notes TEXT NOT NULL DEFAULT '',
         photoPath TEXT,
-        bust REAL,
-        waist REAL,
-        hip REAL,
-        shoulder REAL,
-        sleeveLength REAL,
-        fullLength REAL,
+        $measurementColumns,
         createdAt TEXT NOT NULL
       )
     ''');
@@ -55,6 +53,9 @@ class AppDatabase {
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await _createOrdersAndPayments(db);
+    }
+    if (oldVersion < 3) {
+      await _expandMeasurementColumns(db);
     }
   }
 
@@ -82,5 +83,23 @@ class AppDatabase {
         FOREIGN KEY (orderId) REFERENCES orders (id) ON DELETE CASCADE
       )
     ''');
+  }
+
+  /// Expands the customer measurement set from the original placeholder
+  /// six fields to the full standard set Tessy actually measures.
+  Future<void> _expandMeasurementColumns(Database db) async {
+    // These two already existed under the same name pre-v3.
+    const preexisting = {'bust', 'waist'};
+    for (final field in measurementFields) {
+      if (preexisting.contains(field.key)) continue;
+      await db.execute('ALTER TABLE customers ADD COLUMN ${field.key} REAL');
+    }
+    // The old "hip" field is the same measurement as the new "hips" field,
+    // just renamed, so its values carry over directly. The old shoulder /
+    // sleeveLength / fullLength fields don't map cleanly to any single new
+    // field (e.g. which of the three new sleeve-length variants was a
+    // customer's old single value for?), so those are deliberately left
+    // alone in their original, now-unused columns rather than guessed at.
+    await db.execute('UPDATE customers SET hips = hip');
   }
 }

@@ -104,12 +104,7 @@ void main() {
         phone: '',
         notes: '',
         photoPath: null,
-        bust: null,
-        waist: null,
-        hip: null,
-        shoulder: null,
-        sleeveLength: null,
-        fullLength: null,
+        measurements: const {},
         createdAt: DateTime.now(),
       ),
     );
@@ -158,9 +153,11 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextFormField, 'Full name'), 'Amara Obi');
+    // The measurement form is much longer now (19 fields across sections),
+    // so this needs a bigger scroll distance than a short form would.
     await tester.scrollUntilVisible(
       find.text('Save customer'),
-      300,
+      1000,
       scrollable: find.byType(Scrollable).first,
     );
     await tester.tap(find.text('Save customer'));
@@ -189,12 +186,7 @@ void main() {
         phone: '',
         notes: '',
         photoPath: null,
-        bust: null,
-        waist: null,
-        hip: null,
-        shoulder: null,
-        sleeveLength: null,
-        fullLength: null,
+        measurements: const {},
         createdAt: DateTime.now(),
       ),
     );
@@ -234,12 +226,7 @@ void main() {
         phone: '',
         notes: '',
         photoPath: null,
-        bust: null,
-        waist: null,
-        hip: null,
-        shoulder: null,
-        sleeveLength: null,
-        fullLength: null,
+        measurements: const {},
         createdAt: DateTime.now(),
       ),
     );

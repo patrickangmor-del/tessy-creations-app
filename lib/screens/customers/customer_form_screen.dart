@@ -6,6 +6,7 @@ import '../../state/customers_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/ids.dart';
 import '../../utils/photo_storage.dart';
+import '../../widgets/measurement_sections.dart';
 import '../../widgets/photo_field.dart';
 
 /// Add or edit a customer. Pass an existing [customer] to edit it;
@@ -73,12 +74,9 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
       phone: _phoneCtrl.text.trim(),
       notes: _notesCtrl.text.trim(),
       photoPath: _photoPath,
-      bust: _parseMeasurement('bust'),
-      waist: _parseMeasurement('waist'),
-      hip: _parseMeasurement('hip'),
-      shoulder: _parseMeasurement('shoulder'),
-      sleeveLength: _parseMeasurement('sleeveLength'),
-      fullLength: _parseMeasurement('fullLength'),
+      measurements: {
+        for (final f in measurementFields) f.key: _parseMeasurement(f.key),
+      },
       createdAt: widget.customer?.createdAt ?? now,
     );
 
@@ -143,25 +141,16 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
             const SizedBox(height: 20),
             const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
             const SizedBox(height: 8),
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 2.0,
-              children: [
-                for (final f in measurementFields)
-                  TextFormField(
-                    controller: _measurementCtrls[f.key],
-                    decoration: InputDecoration(labelText: f.label),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return null;
-                      return double.tryParse(v.trim()) == null ? 'Invalid' : null;
-                    },
-                  ),
-              ],
+            MeasurementSections(
+              fieldBuilder: (field) => TextFormField(
+                controller: _measurementCtrls[field.key],
+                decoration: InputDecoration(labelText: field.label),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return null;
+                  return double.tryParse(v.trim()) == null ? 'Invalid' : null;
+                },
+              ),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(

@@ -9,6 +9,7 @@ import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../utils/photo_storage.dart';
+import '../../widgets/measurement_sections.dart';
 import 'customer_form_screen.dart';
 
 class CustomerDetailScreen extends StatelessWidget {
@@ -109,35 +110,26 @@ class CustomerDetailScreen extends StatelessWidget {
           const SizedBox(height: 20),
           const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
           const SizedBox(height: 8),
-          GridView.count(
-            crossAxisCount: 3,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: 1.6,
-            children: [
-              for (final f in measurementFields)
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.cream,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: AppColors.dashedBorder),
+          MeasurementSections(
+            fieldBuilder: (field) => Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.cream,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: AppColors.dashedBorder),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(field.label, style: const TextStyle(fontSize: 10, color: AppColors.inkSoft)),
+                  Text(
+                    customer.measurement(field.key)?.toString() ?? '—',
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(f.label, style: const TextStyle(fontSize: 10, color: AppColors.inkSoft)),
-                      Text(
-                        customer.measurement(f.key)?.toString() ?? '—',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
           if (customer.notes.isNotEmpty) ...[
             const SizedBox(height: 20),
