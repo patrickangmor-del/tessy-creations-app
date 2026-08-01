@@ -12,7 +12,7 @@ class AppDatabase {
   AppDatabase._();
   static final AppDatabase instance = AppDatabase._();
 
-  static const _dbName = 'tessy_creations.db';
+  static const dbFileName = 'tessy_creations.db';
   static const _dbVersion = 3;
 
   Database? _db;
@@ -22,9 +22,23 @@ class AppDatabase {
     return _db!;
   }
 
-  Future<Database> _open() async {
+  /// The on-disk path of the database file, for backup/restore to copy
+  /// directly rather than going through SQL.
+  Future<String> filePath() async {
     final dbPath = await getDatabasesPath();
-    final path = p.join(dbPath, _dbName);
+    return p.join(dbPath, dbFileName);
+  }
+
+  /// Closes the current connection so the underlying file can be safely
+  /// read or replaced (backup/restore). The next call to [database] opens
+  /// it again automatically.
+  Future<void> close() async {
+    await _db?.close();
+    _db = null;
+  }
+
+  Future<Database> _open() async {
+    final path = await filePath();
     return openDatabase(
       path,
       version: _dbVersion,

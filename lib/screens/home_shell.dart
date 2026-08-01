@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import 'backup/backup_screen.dart';
 import 'calendar/calendar_screen.dart';
 import 'customers/customers_list_screen.dart';
 import 'finances/finances_screen.dart';
@@ -42,6 +43,16 @@ class _HomeShellState extends State<HomeShell> {
             Text('Tessy Creations'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.backup_outlined),
+            tooltip: 'Backup & Restore',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const BackupScreen()),
+            ),
+          ),
+        ],
       ),
       body: SafeArea(
         child: IndexedStack(index: _index, children: _bodies),

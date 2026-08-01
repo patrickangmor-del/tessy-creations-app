@@ -50,6 +50,12 @@ dependencies:
   intl: ^0.20.2
   fl_chart: ^0.70.2
 
+  # Backup/restore: bundle the database + photos into a zip, share it out
+  # (e.g. "Save to Drive") for backup, and pick a zip back in to restore.
+  share_plus: ^10.1.4
+  file_picker: ^8.1.6
+  archive: ^4.0.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

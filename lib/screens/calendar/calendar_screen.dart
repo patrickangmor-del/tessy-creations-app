@@ -62,9 +62,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 3, child: monthGrid),
+                // Each side scrolls independently rather than assuming the
+                // month grid + any selected day's orders always fit a fixed
+                // height — a phone in landscape has much less vertical room
+                // than a tablet, and this is one of the required layouts.
+                Expanded(flex: 3, child: SingleChildScrollView(child: monthGrid)),
                 const SizedBox(width: 20),
-                Expanded(flex: 2, child: upcomingList),
+                Expanded(flex: 2, child: SingleChildScrollView(child: upcomingList)),
               ],
             ),
           );
