@@ -37,7 +37,14 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
-      - run: flutter build apk --release
+
+      # Give every build a unique, ever-increasing version number
+      # (GitHub's run number always goes up). Android refuses to install an
+      # APK as an "update" over an existing app unless its version number is
+      # higher than what's already installed, so without this every build
+      # here would carry the same version number (from pubspec.yaml) and
+      # updates would fail, forcing an uninstall first.
+      - run: flutter build apk --release --build-number=${{ github.run_number }}
 
       - uses: actions/upload-artifact@v4
         with:
