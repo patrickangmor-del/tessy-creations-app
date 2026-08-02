@@ -33,3 +33,9 @@ Future<void> deleteSavedPhoto(String? path) async {
     // Not worth surfacing to the user — the DB record is the source of truth.
   }
 }
+
+Future<void> deleteSavedPhotos(List<String> paths) async {
+  for (final path in paths) {
+    await deleteSavedPhoto(path);
+  }
+}

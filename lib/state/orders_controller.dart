@@ -79,7 +79,7 @@ class OrdersController extends ChangeNotifier {
         break;
       }
     }
-    await deleteSavedPhoto(order?.fabricPhotoPath);
+    await deleteSavedPhotos(order?.fabricPhotoPaths ?? const []);
     await _repository.delete(id);
     await load();
   }

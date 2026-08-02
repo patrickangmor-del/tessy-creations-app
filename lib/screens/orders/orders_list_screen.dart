@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -12,6 +10,7 @@ import '../../utils/formatters.dart';
 import '../../utils/receipt.dart';
 import '../../widgets/cut_card.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/photo_strip.dart';
 import '../../widgets/status_stepper.dart';
 import 'order_form_screen.dart';
 
@@ -184,17 +183,9 @@ class _OrderCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(order.fabricDescription, style: const TextStyle(fontSize: 13)),
           ],
-          if (order.fabricPhotoPath != null) ...[
+          if (order.fabricPhotoPaths.isNotEmpty) ...[
             const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.file(
-                File(order.fabricPhotoPath!),
-                height: 100,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-            ),
+            PhotoStrip(photoPaths: order.fabricPhotoPaths, thumbSize: 90),
           ],
           const SizedBox(height: 8),
           Row(

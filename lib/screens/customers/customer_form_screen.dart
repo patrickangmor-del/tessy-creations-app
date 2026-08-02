@@ -5,9 +5,8 @@ import '../../data/models/customer.dart';
 import '../../state/customers_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/ids.dart';
-import '../../utils/photo_storage.dart';
 import '../../widgets/measurement_sections.dart';
-import '../../widgets/photo_field.dart';
+import '../../widgets/photo_gallery_field.dart';
 
 /// Add or edit a customer. Pass an existing [customer] to edit it;
 /// leave it null to create a new one.
@@ -26,7 +25,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
   late final TextEditingController _phoneCtrl;
   late final TextEditingController _notesCtrl;
   late final Map<String, TextEditingController> _measurementCtrls;
-  String? _photoPath;
+  late List<String> _photoPaths;
   bool _saving = false;
 
   bool get _isEditing => widget.customer != null;
@@ -38,7 +37,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
     _nameCtrl = TextEditingController(text: c?.name ?? '');
     _phoneCtrl = TextEditingController(text: c?.phone ?? '');
     _notesCtrl = TextEditingController(text: c?.notes ?? '');
-    _photoPath = c?.photoPath;
+    _photoPaths = List.of(c?.photoPaths ?? const []);
     _measurementCtrls = {
       for (final f in measurementFields)
         f.key: TextEditingController(text: c?.measurement(f.key)?.toString() ?? ''),
@@ -73,7 +72,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
       name: _nameCtrl.text.trim(),
       phone: _phoneCtrl.text.trim(),
       notes: _notesCtrl.text.trim(),
-      photoPath: _photoPath,
+      photoPaths: _photoPaths,
       measurements: {
         for (final f in measurementFields) f.key: _parseMeasurement(f.key),
       },
@@ -81,12 +80,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
     );
 
     if (_isEditing) {
-      // If the photo was replaced, clean up the old file so storage doesn't
-      // slowly fill up with orphaned images.
-      final oldPath = widget.customer!.photoPath;
-      if (oldPath != null && oldPath != _photoPath) {
-        await deleteSavedPhoto(oldPath);
-      }
       await controller.edit(customer);
     } else {
       await controller.add(customer);
@@ -104,15 +97,11 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Center(
-              child: PhotoField(
-                photoPath: _photoPath,
-                onChanged: (path) => setState(() => _photoPath = path),
-                storageSubfolder: 'customer_photos',
-                label: 'Reference photo (optional)',
-                size: 110,
-                circle: true,
-              ),
+            PhotoGalleryField(
+              photoPaths: _photoPaths,
+              onChanged: (paths) => setState(() => _photoPaths = paths),
+              storageSubfolder: 'customer_photos',
+              label: 'Reference photos (optional)',
             ),
             const SizedBox(height: 20),
             TextFormField(

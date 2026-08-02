@@ -11,6 +11,7 @@ import '../../utils/formatters.dart';
 import '../../utils/phone_actions.dart';
 import '../../utils/photo_storage.dart';
 import '../../widgets/measurement_sections.dart';
+import '../../widgets/photo_strip.dart';
 import 'customer_form_screen.dart';
 
 class CustomerDetailScreen extends StatelessWidget {
@@ -44,9 +45,9 @@ class CustomerDetailScreen extends StatelessWidget {
     // their fabric photo files live on disk and need cleaning up here.
     final theirOrders = ordersController.forCustomer(customer.id);
     for (final order in theirOrders) {
-      await deleteSavedPhoto(order.fabricPhotoPath);
+      await deleteSavedPhotos(order.fabricPhotoPaths);
     }
-    await deleteSavedPhoto(customer.photoPath);
+    await deleteSavedPhotos(customer.photoPaths);
     await controller.remove(customer.id);
     await ordersController.load();
     if (context.mounted) Navigator.pop(context);
@@ -88,14 +89,18 @@ class CustomerDetailScreen extends StatelessWidget {
             child: CircleAvatar(
               radius: 55,
               backgroundColor: AppColors.paperDark,
-              backgroundImage: customer.photoPath != null
-                  ? FileImage(File(customer.photoPath!))
+              backgroundImage: customer.primaryPhotoPath != null
+                  ? FileImage(File(customer.primaryPhotoPath!))
                   : null,
-              child: customer.photoPath == null
+              child: customer.primaryPhotoPath == null
                   ? const Icon(Icons.person_outline, size: 40, color: AppColors.inkSoft)
                   : null,
             ),
           ),
+          if (customer.photoPaths.length > 1) ...[
+            const SizedBox(height: 12),
+            PhotoStrip(photoPaths: customer.photoPaths),
+          ],
           const SizedBox(height: 16),
           if (customer.phone.isNotEmpty) ...[
             Center(

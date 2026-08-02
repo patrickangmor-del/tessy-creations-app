@@ -1,4 +1,5 @@
 import 'payment.dart';
+import 'photo_paths.dart';
 
 const dressTypes = [
   'Gown',
@@ -25,7 +26,7 @@ class Order {
     required this.customerId,
     required this.dressType,
     required this.fabricDescription,
-    required this.fabricPhotoPath,
+    required this.fabricPhotoPaths,
     required this.price,
     required this.materialsCost,
     required this.dueDate,
@@ -38,7 +39,7 @@ class Order {
   final String customerId;
   final String dressType;
   final String fabricDescription;
-  final String? fabricPhotoPath;
+  final List<String> fabricPhotoPaths;
   final double price;
 
   /// What the fabric/materials for this order cost Tessy — separate from
@@ -58,8 +59,7 @@ class Order {
   Order copyWith({
     String? dressType,
     String? fabricDescription,
-    String? fabricPhotoPath,
-    bool clearFabricPhoto = false,
+    List<String>? fabricPhotoPaths,
     double? price,
     double? materialsCost,
     String? dueDate,
@@ -72,7 +72,7 @@ class Order {
       customerId: customerId,
       dressType: dressType ?? this.dressType,
       fabricDescription: fabricDescription ?? this.fabricDescription,
-      fabricPhotoPath: clearFabricPhoto ? null : (fabricPhotoPath ?? this.fabricPhotoPath),
+      fabricPhotoPaths: fabricPhotoPaths ?? this.fabricPhotoPaths,
       price: price ?? this.price,
       materialsCost: materialsCost ?? this.materialsCost,
       dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
@@ -89,7 +89,7 @@ class Order {
       'customerId': customerId,
       'dressType': dressType,
       'fabricDescription': fabricDescription,
-      'fabricPhotoPath': fabricPhotoPath,
+      'fabricPhotoPaths': encodePhotoPaths(fabricPhotoPaths),
       'price': price,
       'materialsCost': materialsCost,
       'dueDate': dueDate,
@@ -104,7 +104,7 @@ class Order {
       customerId: map['customerId'] as String,
       dressType: map['dressType'] as String,
       fabricDescription: map['fabricDescription'] as String? ?? '',
-      fabricPhotoPath: map['fabricPhotoPath'] as String?,
+      fabricPhotoPaths: decodePhotoPaths(map['fabricPhotoPaths']),
       price: (map['price'] as num).toDouble(),
       materialsCost: (map['materialsCost'] as num?)?.toDouble(),
       dueDate: map['dueDate'] as String?,

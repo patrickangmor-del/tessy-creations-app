@@ -125,10 +125,10 @@ class _CustomerTile extends StatelessWidget {
             CircleAvatar(
               radius: 22,
               backgroundColor: AppColors.paperDark,
-              backgroundImage: customer.photoPath != null
-                  ? FileImage(File(customer.photoPath!))
+              backgroundImage: customer.primaryPhotoPath != null
+                  ? FileImage(File(customer.primaryPhotoPath!))
                   : null,
-              child: customer.photoPath == null
+              child: customer.primaryPhotoPath == null
                   ? const Icon(Icons.person_outline, color: AppColors.inkSoft)
                   : null,
             ),

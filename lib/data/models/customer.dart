@@ -1,3 +1,5 @@
+import 'photo_paths.dart';
+
 /// A single measurement field shown in the customer form and detail view.
 class MeasurementField {
   const MeasurementField(this.key, this.label);
@@ -57,7 +59,7 @@ class Customer {
     required this.name,
     required this.phone,
     required this.notes,
-    required this.photoPath,
+    required this.photoPaths,
     required this.measurements,
     required this.createdAt,
   });
@@ -66,7 +68,11 @@ class Customer {
   final String name;
   final String phone;
   final String notes;
-  final String? photoPath;
+  final List<String> photoPaths;
+
+  /// The photo shown wherever there's only room for one (list tiles, the
+  /// avatar at the top of the detail screen) — the first one added.
+  String? get primaryPhotoPath => photoPaths.isEmpty ? null : photoPaths.first;
 
   /// Keyed by [MeasurementField.key]. Missing or null means not recorded.
   final Map<String, double?> measurements;
@@ -78,8 +84,7 @@ class Customer {
     String? name,
     String? phone,
     String? notes,
-    String? photoPath,
-    bool clearPhoto = false,
+    List<String>? photoPaths,
     Map<String, double?>? measurements,
   }) {
     return Customer(
@@ -87,7 +92,7 @@ class Customer {
       name: name ?? this.name,
       phone: phone ?? this.phone,
       notes: notes ?? this.notes,
-      photoPath: clearPhoto ? null : (photoPath ?? this.photoPath),
+      photoPaths: photoPaths ?? this.photoPaths,
       measurements: measurements ?? this.measurements,
       createdAt: createdAt,
     );
@@ -101,7 +106,7 @@ class Customer {
       'name': name,
       'phone': phone,
       'notes': notes,
-      'photoPath': photoPath,
+      'photoPaths': encodePhotoPaths(photoPaths),
       'createdAt': createdAt.toIso8601String(),
     };
     for (final field in measurementFields) {
@@ -116,7 +121,7 @@ class Customer {
       name: map['name'] as String,
       phone: map['phone'] as String? ?? '',
       notes: map['notes'] as String? ?? '',
-      photoPath: map['photoPath'] as String?,
+      photoPaths: decodePhotoPaths(map['photoPaths']),
       measurements: {
         for (final field in measurementFields) field.key: (map[field.key] as num?)?.toDouble(),
       },

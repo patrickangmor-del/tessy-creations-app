@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -13,7 +15,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const dbFileName = 'tessy_creations.db';
-  static const _dbVersion = 4;
+  static const _dbVersion = 5;
 
   Database? _db;
 
@@ -56,7 +58,7 @@ class AppDatabase {
         name TEXT NOT NULL,
         phone TEXT NOT NULL DEFAULT '',
         notes TEXT NOT NULL DEFAULT '',
-        photoPath TEXT,
+        photoPaths TEXT,
         $measurementColumns,
         createdAt TEXT NOT NULL
       )
@@ -65,15 +67,20 @@ class AppDatabase {
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
+    final ordersTableIsNew = oldVersion < 2;
+    if (ordersTableIsNew) {
       // Creates the table with every column up to the current schema
-      // (including materialsCost), so the branches below skip it.
+      // (including materialsCost and fabricPhotoPaths), so the branches
+      // below skip touching it.
       await _createOrdersAndPayments(db);
     } else if (oldVersion < 4) {
       await db.execute('ALTER TABLE orders ADD COLUMN materialsCost REAL');
     }
     if (oldVersion < 3) {
       await _expandMeasurementColumns(db);
+    }
+    if (oldVersion < 5) {
+      await _addPhotoListColumns(db, migrateOrders: !ordersTableIsNew);
     }
   }
 
@@ -84,7 +91,7 @@ class AppDatabase {
         customerId TEXT NOT NULL,
         dressType TEXT NOT NULL,
         fabricDescription TEXT NOT NULL DEFAULT '',
-        fabricPhotoPath TEXT,
+        fabricPhotoPaths TEXT,
         price REAL NOT NULL,
         materialsCost REAL,
         dueDate TEXT,
@@ -102,6 +109,44 @@ class AppDatabase {
         FOREIGN KEY (orderId) REFERENCES orders (id) ON DELETE CASCADE
       )
     ''');
+  }
+
+  /// Moves the single `photoPath` / `fabricPhotoPath` columns to
+  /// list-valued `photoPaths` / `fabricPhotoPaths` (JSON-encoded), so a
+  /// customer or order can have more than one photo. [migrateOrders] is
+  /// false when the orders table was just created fresh in this same
+  /// upgrade (it already has the new column, nothing to migrate).
+  Future<void> _addPhotoListColumns(Database db, {required bool migrateOrders}) async {
+    await db.execute('ALTER TABLE customers ADD COLUMN photoPaths TEXT');
+    final customerRows = await db.query(
+      'customers',
+      columns: ['id', 'photoPath'],
+      where: 'photoPath IS NOT NULL',
+    );
+    for (final row in customerRows) {
+      await db.update(
+        'customers',
+        {'photoPaths': jsonEncode([row['photoPath']])},
+        where: 'id = ?',
+        whereArgs: [row['id']],
+      );
+    }
+
+    if (!migrateOrders) return;
+    await db.execute('ALTER TABLE orders ADD COLUMN fabricPhotoPaths TEXT');
+    final orderRows = await db.query(
+      'orders',
+      columns: ['id', 'fabricPhotoPath'],
+      where: 'fabricPhotoPath IS NOT NULL',
+    );
+    for (final row in orderRows) {
+      await db.update(
+        'orders',
+        {'fabricPhotoPaths': jsonEncode([row['fabricPhotoPath']])},
+        where: 'id = ?',
+        whereArgs: [row['id']],
+      );
+    }
   }
 
   /// Expands the customer measurement set from the original placeholder

@@ -6,7 +6,7 @@ import '../../state/customers_controller.dart';
 import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/ids.dart';
-import '../../widgets/photo_field.dart';
+import '../../widgets/photo_gallery_field.dart';
 
 /// A new order. Editing an existing order's core details (customer, dress
 /// type, fabric, price, due date, status) isn't needed day-to-day — status
@@ -28,7 +28,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
   String? _customerId;
   String _dressType = dressTypes.first;
-  String? _fabricPhotoPath;
+  List<String> _fabricPhotoPaths = [];
   DateTime? _dueDate;
   bool _saving = false;
 
@@ -68,7 +68,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       customerId: _customerId!,
       dressType: _dressType,
       fabricDescription: _fabricCtrl.text.trim(),
-      fabricPhotoPath: _fabricPhotoPath,
+      fabricPhotoPaths: _fabricPhotoPaths,
       price: double.parse(_priceCtrl.text.trim()),
       materialsCost: double.tryParse(_materialsCostCtrl.text.trim()),
       dueDate: _dueDate == null
@@ -125,13 +125,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               maxLines: 4,
             ),
             const SizedBox(height: 12),
-            PhotoField(
-              photoPath: _fabricPhotoPath,
-              onChanged: (path) => setState(() => _fabricPhotoPath = path),
+            PhotoGalleryField(
+              photoPaths: _fabricPhotoPaths,
+              onChanged: (paths) => setState(() => _fabricPhotoPaths = paths),
               storageSubfolder: 'fabric_photos',
-              label: 'Fabric photo (optional)',
-              size: 96,
-              placeholderIcon: Icons.image_outlined,
+              label: 'Fabric photos (optional)',
             ),
             const SizedBox(height: 16),
             Row(
