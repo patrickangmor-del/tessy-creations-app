@@ -3,6 +3,7 @@ import '../theme/app_theme.dart';
 import 'backup/backup_screen.dart';
 import 'calendar/calendar_screen.dart';
 import 'customers/customers_list_screen.dart';
+import 'dashboard/dashboard_screen.dart';
 import 'finances/finances_screen.dart';
 import 'orders/orders_list_screen.dart';
 
@@ -18,6 +19,7 @@ class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
   static const _tabs = [
+    _TabSpec('Home', Icons.home_outlined),
     _TabSpec('Customers', Icons.person_outline),
     _TabSpec('Orders', Icons.checkroom_outlined),
     _TabSpec('Calendar', Icons.calendar_month_outlined),
@@ -25,6 +27,7 @@ class _HomeShellState extends State<HomeShell> {
   ];
 
   static final _bodies = [
+    const DashboardScreen(),
     const CustomersListScreen(),
     const OrdersListScreen(),
     const CalendarScreen(),

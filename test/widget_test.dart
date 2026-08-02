@@ -73,11 +73,12 @@ Widget _app({CustomersController? customers, OrdersController? orders}) {
 }
 
 void main() {
-  testWidgets('App launches showing the four Phase 1 tabs', (tester) async {
+  testWidgets('App launches showing all five tabs', (tester) async {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
     expect(find.text('Tessy Creations'), findsOneWidget);
+    expect(find.text('Home'), findsWidgets);
     expect(find.text('Customers'), findsWidgets);
     expect(find.text('Orders'), findsWidgets);
     expect(find.text('Calendar'), findsWidgets);
@@ -143,6 +144,9 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Customers'));
+    await tester.pumpAndSettle();
+
     expect(find.textContaining('No customers yet'), findsOneWidget);
   });
 
@@ -155,6 +159,9 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
     await tester.pumpWidget(_app());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Customers'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.add));
@@ -282,6 +289,9 @@ void main() {
     await tester.pumpWidget(_app(customers: customers));
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Customers'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Amara Obi'), findsOneWidget);
     expect(find.text('Chidinma Eze'), findsOneWidget);
 
@@ -290,5 +300,50 @@ void main() {
 
     expect(find.text('Amara Obi'), findsNothing);
     expect(find.text('Chidinma Eze'), findsOneWidget);
+  });
+
+  testWidgets('Dashboard shows an overdue order and its balance', (tester) async {
+    final customers = _fakeCustomersController();
+    await customers.load();
+    await customers.add(
+      Customer(
+        id: 'c1',
+        name: 'Amara Obi',
+        phone: '',
+        notes: '',
+        photoPaths: const [],
+        measurements: const {},
+        createdAt: DateTime.now(),
+      ),
+    );
+    final orders = _fakeOrdersController();
+    await orders.load();
+    final pastDue = DateTime.now().subtract(const Duration(days: 3));
+    final pastDueIso =
+        '${pastDue.year.toString().padLeft(4, '0')}-${pastDue.month.toString().padLeft(2, '0')}-${pastDue.day.toString().padLeft(2, '0')}';
+    await orders.add(
+      Order(
+        id: 'o1',
+        customerId: 'c1',
+        dressType: 'Gown',
+        fabricDescription: '',
+        fabricPhotoPaths: const [],
+        price: 500,
+        materialsCost: null,
+        dueDate: pastDueIso,
+        status: orderStatuses.first,
+        createdAt: DateTime.now(),
+        payments: const [],
+      ),
+    );
+
+    await tester.pumpWidget(_app(customers: customers, orders: orders));
+    await tester.pumpAndSettle();
+
+    // Both the "Overdue" stat tile label and the "OVERDUE" section heading
+    // read the same once uppercased.
+    expect(find.text('OVERDUE'), findsNWidgets(2));
+    expect(find.textContaining('Amara Obi'), findsWidgets);
+    expect(find.text('₵500'), findsWidgets); // outstanding stat + order balance
   });
 }
