@@ -28,11 +28,25 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        // A fixed key (checked into ci/keystore/) so every CI build has the
+        // same signature and Android will always accept a new APK as an
+        // update to the last one, instead of demanding an uninstall first.
+        // This is pointed at directly by file path rather than relying on
+        // Android's default ~/.android/debug.keystore lookup, because that
+        // default resolves to a different, per-machine keystore on some CI
+        // runner images regardless of what's copied there beforehand.
+        create("release") {
+            storeFile = rootProject.file("../ci/keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }

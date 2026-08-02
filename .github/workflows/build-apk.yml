@@ -25,15 +25,12 @@ jobs:
           flutter-version: "3.44.8"
           channel: "stable"
 
-      # Use a fixed debug-signing key (checked into ci/keystore/) instead of
-      # the random one each fresh CI machine would otherwise generate, so
-      # this build's signature matches the last one and Android can install
-      # it as an update instead of forcing an uninstall (which wipes app data).
-      - name: Install fixed debug-signing key
-        run: |
-          mkdir -p ~/.android
-          cp ci/keystore/debug.keystore ~/.android/debug.keystore
-
+      # The release build is signed with a fixed key checked into
+      # ci/keystore/ (wired up directly in android/app/build.gradle.kts),
+      # instead of a random one each fresh CI machine would otherwise
+      # generate, so this build's signature matches the last one and
+      # Android can install it as an update instead of forcing an
+      # uninstall (which wipes app data).
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
