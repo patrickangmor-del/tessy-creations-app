@@ -8,6 +8,7 @@ import '../../state/customers_controller.dart';
 import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+import '../../utils/phone_actions.dart';
 import '../../utils/photo_storage.dart';
 import '../../widgets/measurement_sections.dart';
 import 'customer_form_screen.dart';
@@ -96,7 +97,7 @@ class CustomerDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          if (customer.phone.isNotEmpty)
+          if (customer.phone.isNotEmpty) ...[
             Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -107,6 +108,24 @@ class CustomerDetailScreen extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => callPhone(customer.phone),
+                  icon: const Icon(Icons.call_outlined, size: 16),
+                  label: const Text('Call'),
+                ),
+                const SizedBox(width: 12),
+                OutlinedButton.icon(
+                  onPressed: () => messageOnWhatsApp(customer.phone),
+                  icon: const Icon(Icons.chat_outlined, size: 16),
+                  label: const Text('WhatsApp'),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 20),
           const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
           const SizedBox(height: 8),

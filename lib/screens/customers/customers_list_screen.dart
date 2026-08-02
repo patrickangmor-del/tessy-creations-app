@@ -11,8 +11,22 @@ import '../../widgets/empty_state.dart';
 import 'customer_detail_screen.dart';
 import 'customer_form_screen.dart';
 
-class CustomersListScreen extends StatelessWidget {
+class CustomersListScreen extends StatefulWidget {
   const CustomersListScreen({super.key});
+
+  @override
+  State<CustomersListScreen> createState() => _CustomersListScreenState();
+}
+
+class _CustomersListScreenState extends State<CustomersListScreen> {
+  final _searchCtrl = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,20 +36,63 @@ class CustomersListScreen extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final customers = controller.customers;
+    final allCustomers = controller.customers;
+    final query = _query.trim().toLowerCase();
+    final customers = query.isEmpty
+        ? allCustomers
+        : allCustomers
+              .where(
+                (c) =>
+                    c.name.toLowerCase().contains(query) ||
+                    c.phone.toLowerCase().contains(query),
+              )
+              .toList();
 
     return Scaffold(
-      body: customers.isEmpty
-          ? const EmptyState(
-              icon: Icons.people_outline,
-              message: 'No customers yet. Tap the + button to add your first one.',
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.all(16),
-              itemCount: customers.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (context, i) => _CustomerTile(customer: customers[i]),
+      body: Column(
+        children: [
+          if (allCustomers.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: TextField(
+                controller: _searchCtrl,
+                onChanged: (v) => setState(() => _query = v),
+                decoration: InputDecoration(
+                  hintText: 'Search by name or phone',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  isDense: true,
+                  suffixIcon: _query.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          onPressed: () => setState(() {
+                            _searchCtrl.clear();
+                            _query = '';
+                          }),
+                        ),
+                ),
+              ),
             ),
+          Expanded(
+            child: allCustomers.isEmpty
+                ? const EmptyState(
+                    icon: Icons.people_outline,
+                    message: 'No customers yet. Tap the + button to add your first one.',
+                  )
+                : customers.isEmpty
+                ? const EmptyState(
+                    icon: Icons.search_off,
+                    message: 'No customers match that search.',
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                    itemCount: customers.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (context, i) => _CustomerTile(customer: customers[i]),
+                  ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'customers-fab',
         backgroundColor: AppColors.thread,

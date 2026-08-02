@@ -259,4 +259,34 @@ void main() {
     expect(find.text('₵300'), findsOneWidget); // outstanding
     expect(find.textContaining('Amara Obi'), findsOneWidget); // recent transaction
   });
+
+  testWidgets('Searching customers filters the list by name', (tester) async {
+    final customers = _fakeCustomersController();
+    await customers.load();
+    for (final name in ['Amara Obi', 'Chidinma Eze']) {
+      await customers.add(
+        Customer(
+          id: name,
+          name: name,
+          phone: '',
+          notes: '',
+          photoPath: null,
+          measurements: const {},
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
+
+    await tester.pumpWidget(_app(customers: customers));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Amara Obi'), findsOneWidget);
+    expect(find.text('Chidinma Eze'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'chidi');
+    await tester.pumpAndSettle();
+
+    expect(find.text('Amara Obi'), findsNothing);
+    expect(find.text('Chidinma Eze'), findsOneWidget);
+  });
 }
