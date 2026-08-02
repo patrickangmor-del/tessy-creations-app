@@ -15,7 +15,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const dbFileName = 'tessy_creations.db';
-  static const _dbVersion = 5;
+  static const _dbVersion = 6;
 
   Database? _db;
 
@@ -64,6 +64,7 @@ class AppDatabase {
       )
     ''');
     await _createOrdersAndPayments(db);
+    await _createMeasurementHistory(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -82,6 +83,22 @@ class AppDatabase {
     if (oldVersion < 5) {
       await _addPhotoListColumns(db, migrateOrders: !ordersTableIsNew);
     }
+    if (oldVersion < 6) {
+      await _createMeasurementHistory(db);
+    }
+  }
+
+  Future<void> _createMeasurementHistory(Database db) async {
+    await db.execute('''
+      CREATE TABLE measurement_history (
+        id TEXT PRIMARY KEY,
+        customerId TEXT NOT NULL,
+        fieldKey TEXT NOT NULL,
+        value REAL NOT NULL,
+        recordedAt TEXT NOT NULL,
+        FOREIGN KEY (customerId) REFERENCES customers (id) ON DELETE CASCADE
+      )
+    ''');
   }
 
   Future<void> _createOrdersAndPayments(Database db) async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:tessy_creations/data/models/customer.dart';
+import 'package:tessy_creations/data/models/measurement_history.dart';
 import 'package:tessy_creations/data/models/order.dart';
 import 'package:tessy_creations/data/models/payment.dart';
 import 'package:tessy_creations/data/repositories/customer_repository.dart';
@@ -29,6 +30,16 @@ class FakeCustomerRepository implements CustomerRepository {
 
   @override
   Future<void> delete(String id) async => _store.removeWhere((c) => c.id == id);
+
+  final List<MeasurementHistoryEntry> _history = [];
+
+  @override
+  Future<void> insertMeasurementHistory(List<MeasurementHistoryEntry> entries) async =>
+      _history.addAll(entries);
+
+  @override
+  Future<List<MeasurementHistoryEntry>> getMeasurementHistory(String customerId) async =>
+      _history.where((e) => e.customerId == customerId).toList();
 }
 
 /// In-memory stand-in for the real sqflite-backed order repository.
@@ -345,5 +356,28 @@ void main() {
     expect(find.text('OVERDUE'), findsNWidgets(2));
     expect(find.textContaining('Amara Obi'), findsWidgets);
     expect(find.text('₵500'), findsWidgets); // outstanding stat + order balance
+  });
+
+  test('Editing a measurement records a history entry for the changed field', () async {
+    final controller = _fakeCustomersController();
+    await controller.load();
+    await controller.add(
+      Customer(
+        id: 'c1',
+        name: 'Amara Obi',
+        phone: '',
+        notes: '',
+        photoPaths: const [],
+        measurements: const {'bust': 34},
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    final updated = controller.byId('c1')!.copyWith(measurements: const {'bust': 36});
+    await controller.edit(updated);
+
+    final history = await controller.measurementHistory('c1');
+    final bustValues = history.where((e) => e.fieldKey == 'bust').map((e) => e.value).toSet();
+    expect(bustValues, {34.0, 36.0});
   });
 }

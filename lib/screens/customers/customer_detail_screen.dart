@@ -13,6 +13,7 @@ import '../../utils/photo_storage.dart';
 import '../../widgets/measurement_sections.dart';
 import '../../widgets/photo_strip.dart';
 import 'customer_form_screen.dart';
+import 'measurement_history_screen.dart';
 
 class CustomerDetailScreen extends StatelessWidget {
   const CustomerDetailScreen({super.key, required this.customerId});
@@ -132,7 +133,31 @@ class CustomerDetailScreen extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 20),
-          const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
+              InkWell(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        MeasurementHistoryScreen(customerId: customer.id, customerName: customer.name),
+                  ),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.history, size: 14, color: AppColors.threadDark),
+                    SizedBox(width: 3),
+                    Text(
+                      'History',
+                      style: TextStyle(fontSize: 12, color: AppColors.threadDark, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 8),
           MeasurementSections(
             fieldBuilder: (field) => Container(
