@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../data/models/order.dart';
 import '../../state/customers_controller.dart';
 import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+import '../../utils/receipt.dart';
 import '../../widgets/cut_card.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/status_stepper.dart';
@@ -162,6 +164,14 @@ class _OrderCard extends StatelessWidget {
                     Text(customerName, style: const TextStyle(fontSize: 12, color: AppColors.inkSoft)),
                   ],
                 ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.share_outlined, size: 20, color: AppColors.inkSoft),
+                tooltip: 'Share receipt',
+                onPressed: () => Share.share(
+                  buildReceiptText(order: order, customerName: customerName),
+                ),
+                visualDensity: VisualDensity.compact,
               ),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 20, color: AppColors.inkSoft),
