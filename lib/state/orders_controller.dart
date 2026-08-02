@@ -5,6 +5,7 @@ import '../data/models/payment.dart';
 import '../data/repositories/order_repository.dart';
 import '../utils/formatters.dart';
 import '../utils/ids.dart';
+import '../utils/notifications.dart';
 import '../utils/photo_storage.dart';
 
 /// Holds the in-memory list of orders and keeps the database in sync,
@@ -30,6 +31,11 @@ class OrdersController extends ChangeNotifier {
     _orders = await _repository.getAll();
     _loading = false;
     notifyListeners();
+    // Re-syncs due-date reminders after every mutation (they all call
+    // load()), and on app startup so reminders are re-armed even if the
+    // device rebooted since the app last ran. A no-op until
+    // NotificationService.init() has actually been called.
+    await NotificationService.instance.syncReminders(_orders);
   }
 
   /// Creates an order. If [initialDeposit] is a positive amount, it's

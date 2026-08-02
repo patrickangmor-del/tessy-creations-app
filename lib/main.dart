@@ -5,8 +5,13 @@ import 'screens/home_shell.dart';
 import 'state/customers_controller.dart';
 import 'state/orders_controller.dart';
 import 'theme/app_theme.dart';
+import 'utils/notifications.dart';
 
-void main() {
+void main() async {
+  // Needs to finish before OrdersController's first load() runs, so the
+  // very first due-date reminder sync isn't silently skipped.
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.instance.init();
   runApp(const TessyApp());
 }
 
