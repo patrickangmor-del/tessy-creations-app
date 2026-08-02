@@ -7,6 +7,7 @@ import '../../state/customers_controller.dart';
 import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/backup_service.dart';
+import '../../utils/csv_export.dart';
 import '../../widgets/cut_card.dart';
 
 class BackupScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class BackupScreen extends StatefulWidget {
 
 class _BackupScreenState extends State<BackupScreen> {
   final _service = BackupService();
+  final _csvService = CsvExportService();
   bool _working = false;
 
   Future<void> _backup() async {
@@ -27,6 +29,28 @@ class _BackupScreenState extends State<BackupScreen> {
       await Share.shareXFiles([XFile(zipPath)], text: 'Tessy Creations backup');
     } catch (e) {
       _showError('Couldn\'t create backup: $e');
+    } finally {
+      if (mounted) setState(() => _working = false);
+    }
+  }
+
+  Future<void> _exportCsv() async {
+    final customersController = context.read<CustomersController>();
+    final ordersController = context.read<OrdersController>();
+
+    setState(() => _working = true);
+    try {
+      final paths = await _csvService.exportCsvFiles(
+        customers: customersController.customers,
+        orders: ordersController.orders,
+        customerName: (id) => customersController.byId(id)?.name ?? 'Unknown',
+      );
+      await Share.shareXFiles(
+        [for (final p in paths) XFile(p)],
+        text: 'Tessy Creations data export',
+      );
+    } catch (e) {
+      _showError('Couldn\'t export CSV: $e');
     } finally {
       if (mounted) setState(() => _working = false);
     }
@@ -139,6 +163,32 @@ class _BackupScreenState extends State<BackupScreen> {
                       onPressed: _working ? null : _restore,
                       icon: const Icon(Icons.restore_outlined),
                       label: const Text('Choose backup file'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              CutCard(
+                accent: AppColors.dashedBorder,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Export as spreadsheet',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Plain CSV files (customers, orders, payments) you can open in Excel, '
+                      'Google Sheets, or send to an accountant. This is for reading your data '
+                      'elsewhere, not for restoring the app — use Backup for that.',
+                      style: TextStyle(color: AppColors.inkSoft),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: _working ? null : _exportCsv,
+                      icon: const Icon(Icons.table_chart_outlined),
+                      label: const Text('Export CSV'),
                     ),
                   ],
                 ),
