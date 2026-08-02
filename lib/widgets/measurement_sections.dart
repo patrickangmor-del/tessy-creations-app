@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/models/customer.dart';
-import '../theme/app_theme.dart';
+import 'section_header.dart';
 
 /// Lays out every measurement field grouped into its section (general
 /// fields first with no heading, then Skirt/Slit Length, Sleeve Length,
@@ -24,7 +24,7 @@ class MeasurementSections extends StatelessWidget {
       children: [
         for (final section in measurementSections) ...[
           if (section.title != null) ...[
-            Text(section.title!.toUpperCase(), style: sectionLabelStyle),
+            SectionHeader(section.title!.toUpperCase()),
             const SizedBox(height: 8),
           ],
           GridView.count(

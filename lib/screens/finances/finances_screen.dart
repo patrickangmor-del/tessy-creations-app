@@ -8,6 +8,7 @@ import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/cut_card.dart';
+import '../../widgets/section_header.dart';
 
 class _MonthlyRevenue {
   const _MonthlyRevenue(this.monthKey, this.amount);
@@ -132,7 +133,7 @@ class FinancesScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const Text('PAYMENTS COLLECTED BY MONTH', style: sectionLabelStyle),
+        const SectionHeader('PAYMENTS COLLECTED BY MONTH'),
         const SizedBox(height: 12),
         SizedBox(
           height: 200,
@@ -143,7 +144,7 @@ class FinancesScreen extends StatelessWidget {
               : _RevenueChart(data: monthly),
         ),
         const SizedBox(height: 24),
-        const Text('RECENT TRANSACTIONS', style: sectionLabelStyle),
+        const SectionHeader('RECENT TRANSACTIONS'),
         const SizedBox(height: 8),
         if (recentTransactions.isEmpty)
           const Padding(

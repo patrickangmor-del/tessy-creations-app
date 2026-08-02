@@ -7,6 +7,7 @@ import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/cut_card.dart';
+import '../../widgets/section_header.dart';
 
 /// The app's landing tab: an at-a-glance view of what needs attention
 /// today, instead of having to check Calendar and Finances separately.
@@ -66,12 +67,12 @@ class DashboardScreen extends StatelessWidget {
         ),
         if (overdue.isNotEmpty) ...[
           const SizedBox(height: 24),
-          const Text('OVERDUE', style: sectionLabelStyle),
+          const SectionHeader('OVERDUE'),
           const SizedBox(height: 8),
           for (final o in overdue) _OrderRow(order: o, customerName: nameFor(o), overdue: true),
         ],
         const SizedBox(height: 24),
-        const Text('UPCOMING', style: sectionLabelStyle),
+        const SectionHeader('UPCOMING'),
         const SizedBox(height: 8),
         if (dueSoon.isEmpty)
           const Text('Nothing due — you\'re all caught up.', style: TextStyle(color: AppColors.inkSoft))

@@ -82,8 +82,8 @@ ThemeData buildAppTheme() {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.ink,
-        side: const BorderSide(color: Color(0xFFC9BC98)),
+        foregroundColor: AppColors.threadDark,
+        side: const BorderSide(color: AppColors.thread, width: 1.2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
     ),

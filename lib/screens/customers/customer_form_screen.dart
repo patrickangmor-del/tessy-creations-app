@@ -7,6 +7,7 @@ import '../../theme/app_theme.dart';
 import '../../utils/ids.dart';
 import '../../widgets/measurement_sections.dart';
 import '../../widgets/photo_gallery_field.dart';
+import '../../widgets/section_header.dart';
 
 /// Add or edit a customer. Pass an existing [customer] to edit it;
 /// leave it null to create a new one.
@@ -128,7 +129,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
               maxLines: 4,
             ),
             const SizedBox(height: 20),
-            const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
+            const SectionHeader('MEASUREMENTS (INCHES)'),
             const SizedBox(height: 8),
             MeasurementSections(
               fieldBuilder: (field) => TextFormField(

@@ -12,6 +12,7 @@ import '../../utils/phone_actions.dart';
 import '../../utils/photo_storage.dart';
 import '../../widgets/measurement_sections.dart';
 import '../../widgets/photo_strip.dart';
+import '../../widgets/section_header.dart';
 import 'customer_form_screen.dart';
 import 'measurement_history_screen.dart';
 
@@ -133,30 +134,27 @@ class CustomerDetailScreen extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('MEASUREMENTS (INCHES)', style: sectionLabelStyle),
-              InkWell(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        MeasurementHistoryScreen(customerId: customer.id, customerName: customer.name),
-                  ),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.history, size: 14, color: AppColors.threadDark),
-                    SizedBox(width: 3),
-                    Text(
-                      'History',
-                      style: TextStyle(fontSize: 12, color: AppColors.threadDark, fontWeight: FontWeight.w600),
-                    ),
-                  ],
+          SectionHeader(
+            'MEASUREMENTS (INCHES)',
+            trailing: InkWell(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      MeasurementHistoryScreen(customerId: customer.id, customerName: customer.name),
                 ),
               ),
-            ],
+              child: const Row(
+                children: [
+                  Icon(Icons.history, size: 14, color: AppColors.threadDark),
+                  SizedBox(width: 3),
+                  Text(
+                    'History',
+                    style: TextStyle(fontSize: 12, color: AppColors.threadDark, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 8),
           MeasurementSections(
@@ -182,7 +180,7 @@ class CustomerDetailScreen extends StatelessWidget {
           ),
           if (customer.notes.isNotEmpty) ...[
             const SizedBox(height: 20),
-            const Text('NOTES', style: sectionLabelStyle),
+            const SectionHeader('NOTES'),
             const SizedBox(height: 6),
             Text(customer.notes),
           ],

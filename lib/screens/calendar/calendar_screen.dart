@@ -7,6 +7,7 @@ import '../../state/orders_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/cut_card.dart';
+import '../../widgets/section_header.dart';
 
 const _weekdayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -162,7 +163,7 @@ class _MonthGrid extends StatelessWidget {
         ),
         if (selectedDate != null && dueMap[selectedDate] != null) ...[
           const SizedBox(height: 16),
-          Text('DUE ${formatDate(selectedDate).toUpperCase()}', style: sectionLabelStyle),
+          SectionHeader('DUE ${formatDate(selectedDate).toUpperCase()}'),
           const SizedBox(height: 8),
           for (final order in dueMap[selectedDate]!) _SelectedDayOrder(order: order),
         ],
@@ -266,7 +267,7 @@ class _UpcomingList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('UPCOMING PICKUPS', style: sectionLabelStyle),
+        const SectionHeader('UPCOMING PICKUPS'),
         const SizedBox(height: 8),
         if (orders.isEmpty)
           const Text('Nothing scheduled.', style: TextStyle(color: AppColors.inkSoft))
