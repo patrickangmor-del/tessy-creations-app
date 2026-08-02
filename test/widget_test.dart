@@ -121,6 +121,7 @@ void main() {
         fabricDescription: '',
         fabricPhotoPath: null,
         price: 500,
+        materialsCost: null,
         dueDate: dueIso,
         status: orderStatuses.first,
         createdAt: DateTime.now(),
@@ -146,6 +147,13 @@ void main() {
   });
 
   testWidgets('Adding a customer shows it in the list', (tester) async {
+    // A tall viewport so the (long, 19-field) measurement form fits without
+    // needing to scroll to reach the save button — scrolling reliably in a
+    // test here is awkward since MeasurementSections' GridViews are each
+    // their own (non-scrolling) Scrollable nested inside the form's.
+    await tester.binding.setSurfaceSize(const Size(800, 2600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
@@ -153,13 +161,6 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.widgetWithText(TextFormField, 'Full name'), 'Amara Obi');
-    // The measurement form is much longer now (19 fields across sections),
-    // so this needs a bigger scroll distance than a short form would.
-    await tester.scrollUntilVisible(
-      find.text('Save customer'),
-      1000,
-      scrollable: find.byType(Scrollable).first,
-    );
     await tester.tap(find.text('Save customer'));
     await tester.pumpAndSettle();
 
@@ -177,6 +178,9 @@ void main() {
   });
 
   testWidgets('Creating an order shows it with the right balance', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(800, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
     final customers = _fakeCustomersController();
     await customers.load();
     await customers.add(
@@ -202,11 +206,6 @@ void main() {
 
     await tester.enterText(find.widgetWithText(TextFormField, 'Price'), '500');
     await tester.enterText(find.widgetWithText(TextFormField, 'Deposit paid now'), '200');
-    await tester.scrollUntilVisible(
-      find.text('Save order'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
     await tester.tap(find.text('Save order'));
     await tester.pumpAndSettle();
 
@@ -240,6 +239,7 @@ void main() {
         fabricDescription: '',
         fabricPhotoPath: null,
         price: 500,
+        materialsCost: 100,
         dueDate: null,
         status: orderStatuses.first,
         createdAt: DateTime.now(),
@@ -257,6 +257,8 @@ void main() {
     expect(find.text('₵500'), findsOneWidget); // revenue
     expect(find.text('₵200'), findsOneWidget); // collected
     expect(find.text('₵300'), findsOneWidget); // outstanding
+    expect(find.text('₵100'), findsOneWidget); // materials cost
+    expect(find.text('₵400'), findsOneWidget); // profit
     expect(find.textContaining('Amara Obi'), findsOneWidget); // recent transaction
   });
 

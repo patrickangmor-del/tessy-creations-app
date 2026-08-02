@@ -27,6 +27,7 @@ class Order {
     required this.fabricDescription,
     required this.fabricPhotoPath,
     required this.price,
+    required this.materialsCost,
     required this.dueDate,
     required this.status,
     required this.createdAt,
@@ -40,6 +41,10 @@ class Order {
   final String? fabricPhotoPath;
   final double price;
 
+  /// What the fabric/materials for this order cost Tessy — separate from
+  /// [price], which is what the customer pays. Null means not recorded.
+  final double? materialsCost;
+
   /// ISO yyyy-MM-dd, or null if no due date was set.
   final String? dueDate;
   final String status;
@@ -48,6 +53,7 @@ class Order {
 
   double get amountPaid => payments.fold(0, (sum, p) => sum + p.amount);
   double get balance => price - amountPaid;
+  double get profit => price - (materialsCost ?? 0);
 
   Order copyWith({
     String? dressType,
@@ -55,6 +61,7 @@ class Order {
     String? fabricPhotoPath,
     bool clearFabricPhoto = false,
     double? price,
+    double? materialsCost,
     String? dueDate,
     bool clearDueDate = false,
     String? status,
@@ -67,6 +74,7 @@ class Order {
       fabricDescription: fabricDescription ?? this.fabricDescription,
       fabricPhotoPath: clearFabricPhoto ? null : (fabricPhotoPath ?? this.fabricPhotoPath),
       price: price ?? this.price,
+      materialsCost: materialsCost ?? this.materialsCost,
       dueDate: clearDueDate ? null : (dueDate ?? this.dueDate),
       status: status ?? this.status,
       createdAt: createdAt,
@@ -83,6 +91,7 @@ class Order {
       'fabricDescription': fabricDescription,
       'fabricPhotoPath': fabricPhotoPath,
       'price': price,
+      'materialsCost': materialsCost,
       'dueDate': dueDate,
       'status': status,
       'createdAt': createdAt.toIso8601String(),
@@ -97,6 +106,7 @@ class Order {
       fabricDescription: map['fabricDescription'] as String? ?? '',
       fabricPhotoPath: map['fabricPhotoPath'] as String?,
       price: (map['price'] as num).toDouble(),
+      materialsCost: (map['materialsCost'] as num?)?.toDouble(),
       dueDate: map['dueDate'] as String?,
       status: map['status'] as String,
       createdAt: DateTime.parse(map['createdAt'] as String),

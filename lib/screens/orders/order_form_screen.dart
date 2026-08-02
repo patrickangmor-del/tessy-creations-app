@@ -22,6 +22,7 @@ class OrderFormScreen extends StatefulWidget {
 class _OrderFormScreenState extends State<OrderFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _priceCtrl = TextEditingController();
+  final _materialsCostCtrl = TextEditingController();
   final _depositCtrl = TextEditingController();
   final _fabricCtrl = TextEditingController();
 
@@ -41,6 +42,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   @override
   void dispose() {
     _priceCtrl.dispose();
+    _materialsCostCtrl.dispose();
     _depositCtrl.dispose();
     _fabricCtrl.dispose();
     super.dispose();
@@ -68,6 +70,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       fabricDescription: _fabricCtrl.text.trim(),
       fabricPhotoPath: _fabricPhotoPath,
       price: double.parse(_priceCtrl.text.trim()),
+      materialsCost: double.tryParse(_materialsCostCtrl.text.trim()),
       dueDate: _dueDate == null
           ? null
           : '${_dueDate!.year.toString().padLeft(4, '0')}-${_dueDate!.month.toString().padLeft(2, '0')}-${_dueDate!.day.toString().padLeft(2, '0')}',
@@ -157,6 +160,19 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _materialsCostCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Materials/fabric cost (optional)',
+                hintText: 'What this order cost you to make',
+              ),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return null;
+                return double.tryParse(v.trim()) == null ? 'Invalid' : null;
+              },
             ),
             const SizedBox(height: 12),
             InkWell(

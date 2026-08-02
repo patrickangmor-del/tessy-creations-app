@@ -52,6 +52,8 @@ class FinancesScreen extends StatelessWidget {
     final totalRevenue = orders.fold<double>(0, (sum, o) => sum + o.price);
     final totalCollected = orders.fold<double>(0, (sum, o) => sum + o.amountPaid);
     final outstanding = totalRevenue - totalCollected;
+    final totalCost = orders.fold<double>(0, (sum, o) => sum + (o.materialsCost ?? 0));
+    final totalProfit = totalRevenue - totalCost;
 
     final monthlyTotals = <String, double>{};
     final transactions = <_Transaction>[];
@@ -104,6 +106,29 @@ class FinancesScreen extends StatelessWidget {
                 valueColor: outstanding > 0 ? AppColors.pin : AppColors.ink,
               ),
             ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _SummaryCard(
+                label: 'Materials cost',
+                value: totalCost,
+                accent: AppColors.inkSoft,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _SummaryCard(
+                label: 'Profit',
+                value: totalProfit,
+                accent: AppColors.gold,
+                valueColor: totalProfit < 0 ? AppColors.pin : AppColors.thread,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(child: SizedBox.shrink()),
           ],
         ),
         const SizedBox(height: 24),

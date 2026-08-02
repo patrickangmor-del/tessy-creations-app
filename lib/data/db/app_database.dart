@@ -13,7 +13,7 @@ class AppDatabase {
   static final AppDatabase instance = AppDatabase._();
 
   static const dbFileName = 'tessy_creations.db';
-  static const _dbVersion = 3;
+  static const _dbVersion = 4;
 
   Database? _db;
 
@@ -66,7 +66,11 @@ class AppDatabase {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
+      // Creates the table with every column up to the current schema
+      // (including materialsCost), so the branches below skip it.
       await _createOrdersAndPayments(db);
+    } else if (oldVersion < 4) {
+      await db.execute('ALTER TABLE orders ADD COLUMN materialsCost REAL');
     }
     if (oldVersion < 3) {
       await _expandMeasurementColumns(db);
@@ -82,6 +86,7 @@ class AppDatabase {
         fabricDescription TEXT NOT NULL DEFAULT '',
         fabricPhotoPath TEXT,
         price REAL NOT NULL,
+        materialsCost REAL,
         dueDate TEXT,
         status TEXT NOT NULL,
         createdAt TEXT NOT NULL,
